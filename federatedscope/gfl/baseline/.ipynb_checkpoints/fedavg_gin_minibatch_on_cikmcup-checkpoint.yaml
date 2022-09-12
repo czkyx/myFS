@@ -1,0 +1,68 @@
+use_gpu: True
+device: 0
+early_stop:
+  patience: 6
+  improve_indicator_mode: mean
+  the_smaller_the_better: False
+federate:
+  mode: 'standalone'
+  make_global_eval: False
+  total_round_num: 200
+  share_local_model: False  #no change!!
+  #data_weighted_aggr: True  # change!
+  client_num: 13
+data:
+  root: data/
+  type: cikmcup
+model:
+  type: gin
+  hidden: 64
+personalization:
+  local_param: ['encoder_atom', 'encoder', 'clf','norm'] 
+train:
+  batch_or_epoch: epoch
+  local_update_steps: 2
+  optimizer:
+    type: SGD
+    lr: 0.8
+    weight_decay: 0.01
+   # momentum: 0.5
+################
+
+trainer:
+  type:  graphmaml_trainer  ## change!!!
+### change
+
+#finetune:
+ # before_eval: true
+#  local_update_steps: 10
+  
+
+eval:
+  freq: 5
+  metrics: ['imp_ratio'] ## no change
+  report: ['avg']
+  best_res_update_round_wise_key: val_imp_ratio
+  count_flops: False
+  base: 0.
+### change
+maml:
+  use: True
+  inner_lr: 0.1
+wandb:
+  name_project: fedmaml_gpushare
+  name_user: czdream
+  online_track: true
+  use: false
+#fedprox:
+#  mu: 0.5
+
+hpo:
+  scheduler: sha
+  num_workers: 0
+  init_cand_num: 12
+  ss: 'federatedscope/example_configs/femnist/hpo_ss_sha.yaml'
+  sha:
+    budgets: [1, 2, 4]
+  metric: 'client_summarized_avg.val_imp_ratio'
+  working_folder: 'data'
